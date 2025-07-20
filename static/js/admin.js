@@ -53,6 +53,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // Image URL change handler
+    document.getElementById('productImage').addEventListener('input', function() {
+        const imageUrl = this.value.trim();
+        if (imageUrl) {
+            showImagePreview(imageUrl);
+        } else {
+            document.getElementById('imagePreview').style.display = 'none';
+        }
+    });
+    
     function loadProducts() {
         fetch('/api/products')
         .then(response => response.json())
@@ -104,11 +114,13 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         
         products.forEach(product => {
+            const imageUrl = product.image || product.image_path || 'https://via.placeholder.com/300x300?text=صورة+غير+متوفرة';
             html += `
                 <tr>
                     <td>
-                        <img src="${product.image}" alt="${product.name}" 
-                             style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                        <img src="${imageUrl}" alt="${product.name}" 
+                             style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;"
+                             onerror="this.src='https://via.placeholder.com/300x300?text=صورة+غير+متوفرة';">
                     </td>
                     <td>${product.name}</td>
                     <td>${product.price}</td>
@@ -648,10 +660,12 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             if (data.success) {
+                // تحديث حقل رابط الصورة
                 document.getElementById('productImage').value = data.image_url;
+                // عرض معاينة الصورة في النموذج
                 showImagePreview(data.image_url);
                 showAlert('تم رفع الصورة بنجاح', 'success');
-                // Clear the file input
+                // مسح اختيار الملف
                 fileInput.value = '';
             } else {
                 throw new Error(data.error || 'خطأ في رفع الصورة');
