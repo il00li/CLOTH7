@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         
         products.forEach(product => {
-            const imageUrl = product.image || product.image_path || 'https://via.placeholder.com/300x300?text=صورة+غير+متوفرة';
+            const imageUrl = product.image_path || product.image || 'https://via.placeholder.com/300x300?text=صورة+غير+متوفرة';
             html += `
                 <tr>
                     <td>
@@ -198,11 +198,16 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('productName').value = product.name;
             document.getElementById('productPrice').value = product.price;
             document.getElementById('productCategory').value = product.category;
-            document.getElementById('productImage').value = product.image;
+            document.getElementById('productImage').value = product.image_path || product.image || '';
             document.getElementById('productColors').value = Array.isArray(product.colors) ? product.colors.join(', ') : product.colors || '';
             document.getElementById('productSizes').value = Array.isArray(product.sizes) ? product.sizes.join(', ') : product.sizes || '';
             document.getElementById('productMaterial').value = product.material;
             document.getElementById('productDescription').value = product.description;
+            
+            // عرض الصورة في المعاينة إذا كانت موجودة
+            if (product.image_path || product.image) {
+                showImagePreview(product.image_path || product.image);
+            }
         } else {
             // Adding new product
             document.getElementById('productModalTitle').textContent = 'إضافة منتج جديد';
@@ -324,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
             name: document.getElementById('productName').value,
             price: document.getElementById('productPrice').value,
             category: document.getElementById('productCategory').value,
-            image: document.getElementById('productImage').value,
+            image_path: document.getElementById('productImage').value,
             colors: document.getElementById('productColors').value.split(',').map(c => c.trim()).filter(c => c),
             sizes: document.getElementById('productSizes').value.split(',').map(s => s.trim()).filter(s => s),
             material: document.getElementById('productMaterial').value,

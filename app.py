@@ -249,6 +249,7 @@ def handle_products():
                 'price': product.price,
                 'category': product.category,
                 'image': product.image_path,
+                'image_path': product.image_path,
                 'colors': product.get_colors(),
                 'sizes': product.get_sizes(),
                 'material': product.material or '',
@@ -272,7 +273,7 @@ def handle_products():
                 product.name = product_data['name']
                 product.price = product_data['price']
                 product.category = product_data['category']
-                product.image_path = product_data.get('image', product.image_path)
+                product.image_path = product_data.get('image_path', product_data.get('image', product.image_path))
                 product.material = product_data.get('material', '')
                 product.description = product_data.get('description', '')
                 product.set_colors(product_data.get('colors', []))
@@ -283,7 +284,7 @@ def handle_products():
                     name=product_data['name'],
                     price=product_data['price'],
                     category=product_data['category'],
-                    image_path=product_data.get('image', ''),
+                    image_path=product_data.get('image_path', product_data.get('image', '')),
                     material=product_data.get('material', ''),
                     description=product_data.get('description', '')
                 )
@@ -485,6 +486,7 @@ def filter_products(category):
             'price': product.price,
             'category': product.category,
             'image': product.image_path,
+            'image_path': product.image_path,
             'colors': product.get_colors(),
             'sizes': product.get_sizes(),
             'material': product.material,
