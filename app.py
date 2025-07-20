@@ -251,8 +251,8 @@ def handle_products():
                 'image': product.image_path,
                 'colors': product.get_colors(),
                 'sizes': product.get_sizes(),
-                'material': product.material,
-                'description': product.description
+                'material': product.material or '',
+                'description': product.description or ''
             })
         return jsonify(products_data)
     
@@ -260,37 +260,44 @@ def handle_products():
         if not session.get('admin_logged_in'):
             return jsonify({'error': 'غير مصرح'}), 403
         
-        # This handles saving a single product
-        product_data = request.json
-        
-        if 'id' in product_data and product_data['id']:
-            # Update existing product
-            product = models.Product.query.get(product_data['id'])
-            if product:
+        try:
+            product_data = request.json
+            
+            if 'id' in product_data and product_data['id']:
+                # Update existing product
+                product = models.Product.query.get(product_data['id'])
+                if not product:
+                    return jsonify({'error': 'المنتج غير موجود'}), 404
+                    
                 product.name = product_data['name']
                 product.price = product_data['price']
                 product.category = product_data['category']
                 product.image_path = product_data.get('image', product.image_path)
-                product.material = product_data['material']
-                product.description = product_data['description']
-                product.set_colors(product_data['colors'])
-                product.set_sizes(product_data['sizes'])
-        else:
-            # Create new product
-            product = models.Product(
-                name=product_data['name'],
-                price=product_data['price'],
-                category=product_data['category'],
-                image_path=product_data.get('image', ''),
-                material=product_data['material'],
-                description=product_data['description']
-            )
-            product.set_colors(product_data['colors'])
-            product.set_sizes(product_data['sizes'])
-            db.session.add(product)
-        
-        db.session.commit()
-        return jsonify({'success': True})
+                product.material = product_data.get('material', '')
+                product.description = product_data.get('description', '')
+                product.set_colors(product_data.get('colors', []))
+                product.set_sizes(product_data.get('sizes', []))
+            else:
+                # Create new product
+                product = models.Product(
+                    name=product_data['name'],
+                    price=product_data['price'],
+                    category=product_data['category'],
+                    image_path=product_data.get('image', ''),
+                    material=product_data.get('material', ''),
+                    description=product_data.get('description', '')
+                )
+                product.set_colors(product_data.get('colors', []))
+                product.set_sizes(product_data.get('sizes', []))
+                db.session.add(product)
+            
+            db.session.commit()
+            return jsonify({'success': True})
+            
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error saving product: {str(e)}")
+            return jsonify({'error': f'خطأ في حفظ المنتج: {str(e)}'}), 500
 
 @app.route('/api/settings', methods=['GET', 'POST'])
 def handle_settings():

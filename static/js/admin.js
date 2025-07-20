@@ -195,8 +195,8 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('productPrice').value = product.price;
             document.getElementById('productCategory').value = product.category;
             document.getElementById('productImage').value = product.image;
-            document.getElementById('productColors').value = product.colors.join(', ');
-            document.getElementById('productSizes').value = product.sizes.join(', ');
+            document.getElementById('productColors').value = Array.isArray(product.colors) ? product.colors.join(', ') : product.colors || '';
+            document.getElementById('productSizes').value = Array.isArray(product.sizes) ? product.sizes.join(', ') : product.sizes || '';
             document.getElementById('productMaterial').value = product.material;
             document.getElementById('productDescription').value = product.description;
         } else {
@@ -301,30 +301,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function saveProduct() {
+        const productId = document.getElementById('productId').value;
+        const isEditing = productId !== '';
+        
         const productData = {
             name: document.getElementById('productName').value,
-            price: parseFloat(document.getElementById('productPrice').value),
+            price: document.getElementById('productPrice').value,
             category: document.getElementById('productCategory').value,
             image: document.getElementById('productImage').value,
-            colors: document.getElementById('productColors').value.split(',').map(c => c.trim()).filter(c => c).join(', '),
-            sizes: document.getElementById('productSizes').value.split(',').map(s => s.trim()).filter(s => s).join(', '),
+            colors: document.getElementById('productColors').value.split(',').map(c => c.trim()).filter(c => c),
+            sizes: document.getElementById('productSizes').value.split(',').map(s => s.trim()).filter(s => s),
             material: document.getElementById('productMaterial').value,
             description: document.getElementById('productDescription').value
         };
         
-        const productId = document.getElementById('productId').value;
-        const isEditing = productId !== '';
-        
-        let url = '/api/products';
-        let method = 'POST';
-        
         if (isEditing) {
-            url = `/api/products/${productId}`;
-            method = 'PUT';
+            productData.id = productId;
         }
         
-        fetch(url, {
-            method: method,
+        fetch('/api/products', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -334,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 showAlert(isEditing ? 'تم تحديث المنتج بنجاح' : 'تم إضافة المنتج بنجاح', 'success');
-                loadProducts(); // Reload products from server
+                loadProducts();
                 bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
             } else {
                 throw new Error(data.error || 'خطأ في الحفظ');
@@ -342,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Error saving product:', error);
-            showAlert('خطأ في حفظ المنتج', 'danger');
+            showAlert(error.message || 'خطأ في حفظ المنتج', 'danger');
         });
     }
     
