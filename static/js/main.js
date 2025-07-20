@@ -98,27 +98,24 @@ document.addEventListener('DOMContentLoaded', function() {
             const productName = this.getAttribute('data-product-name');
             const productPrice = this.getAttribute('data-product-price');
             const productImage = this.getAttribute('data-product-image');
+            const productColors = this.getAttribute('data-product-colors');
+            const productSizes = this.getAttribute('data-product-sizes');
+            const productMaterial = this.getAttribute('data-product-material');
+            const productDescription = this.getAttribute('data-product-description');
             
             // Get WhatsApp number from settings
             const whatsappNumber = window.storeSettings?.whatsapp_number || '967700000000';
-            
-            // Get product details from the card
-            const productCard = this.closest('.product-card');
-            const material = productCard.querySelector('.product-material')?.textContent || '';
-            const colors = productCard.querySelector('.product-colors')?.textContent || '';
-            const sizes = productCard.querySelector('.product-sizes')?.textContent || '';
-            const description = productCard.querySelector('.product-description')?.textContent || '';
             
             const message = `السلام عليكم ورحمة الله وبركاته
 
 أريد طلب المنتج التالي:
 
 📦 *اسم المنتج:* ${productName}
-💰 *السعر:* ${productPrice}
-🧵 *الخامة:* ${material}
-🎨 *الألوان المتاحة:* ${colors}
-📏 *المقاسات المتاحة:* ${sizes}
-📝 *الوصف:* ${description}
+💰 *السعر:* ${productPrice} ريال يمني
+🧵 *نوع القماش:* ${productMaterial}
+🎨 *الألوان المتاحة:* ${productColors}
+📏 *المقاسات المتاحة:* ${productSizes}
+📝 *الوصف:* ${productDescription}
 
 🖼️ *صورة المنتج:*
 ${productImage}

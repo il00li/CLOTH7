@@ -36,7 +36,6 @@
             <div class="row">
                 <div class="col-12 text-center">
                     <h1 class="store-title-glass">
-                        <i class="fas fa-store text-primary me-2"></i>
                         {{ settings.store_name }}
                     </h1>
                 </div>
@@ -97,8 +96,8 @@
                             
                             <!-- Product Details (Initially Hidden) -->
                             <div class="product-details" style="display: none;">
-                                <p><strong>الألوان المتوفرة:</strong> {{ ', '.join(product.colors) }}</p>
-                                <p><strong>المقاسات:</strong> {{ ', '.join(product.sizes) }}</p>
+                                <p><strong>الألوان المتوفرة:</strong> {{ product.colors }}</p>
+                                <p><strong>المقاسات:</strong> {{ product.sizes }}</p>
                                 <p><strong>نوع القماش:</strong> {{ product.material }}</p>
                                 <p><strong>الوصف:</strong> {{ product.description }}</p>
                             </div>
@@ -112,7 +111,11 @@
                                 <button class="btn btn-success btn-sm btn-order" 
                                         data-product-name="{{ product.name }}"
                                         data-product-price="{{ product.price }}"
-                                        data-product-image="{{ product.image }}">
+                                        data-product-image="{{ product.image }}"
+                                        data-product-colors="{{ product.colors }}"
+                                        data-product-sizes="{{ product.sizes }}"
+                                        data-product-material="{{ product.material }}"
+                                        data-product-description="{{ product.description }}">
                                     <i class="fab fa-whatsapp me-1"></i>
                                     طلب المنتج
                                 </button>

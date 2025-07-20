@@ -301,45 +301,40 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function saveProduct() {
-        const formData = {
-            id: document.getElementById('productId').value || Date.now(),
+        const productData = {
             name: document.getElementById('productName').value,
-            price: document.getElementById('productPrice').value,
+            price: parseFloat(document.getElementById('productPrice').value),
             category: document.getElementById('productCategory').value,
             image: document.getElementById('productImage').value,
-            colors: document.getElementById('productColors').value.split(',').map(c => c.trim()).filter(c => c),
-            sizes: document.getElementById('productSizes').value.split(',').map(s => s.trim()).filter(s => s),
+            colors: document.getElementById('productColors').value.split(',').map(c => c.trim()).filter(c => c).join(', '),
+            sizes: document.getElementById('productSizes').value.split(',').map(s => s.trim()).filter(s => s).join(', '),
             material: document.getElementById('productMaterial').value,
             description: document.getElementById('productDescription').value
         };
         
-        const isEditing = document.getElementById('productId').value !== '';
+        const productId = document.getElementById('productId').value;
+        const isEditing = productId !== '';
+        
+        let url = '/api/products';
+        let method = 'POST';
         
         if (isEditing) {
-            // Update existing product
-            const index = products.findIndex(p => p.id == formData.id);
-            if (index !== -1) {
-                products[index] = formData;
-            }
-        } else {
-            // Add new product
-            formData.id = parseInt(formData.id);
-            products.push(formData);
+            url = `/api/products/${productId}`;
+            method = 'PUT';
         }
         
-        // Save to server
-        fetch('/api/products', {
-            method: 'POST',
+        fetch(url, {
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(products)
+            body: JSON.stringify(productData)
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
                 showAlert(isEditing ? 'تم تحديث المنتج بنجاح' : 'تم إضافة المنتج بنجاح', 'success');
-                renderProductsTable();
+                loadProducts(); // Reload products from server
                 bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
             } else {
                 throw new Error(data.error || 'خطأ في الحفظ');
