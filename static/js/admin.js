@@ -13,10 +13,21 @@ document.addEventListener('DOMContentLoaded', function() {
         openProductModal();
     });
     
+    // Add Category Button
+    document.getElementById('addCategoryBtn').addEventListener('click', function() {
+        openCategoryModal();
+    });
+    
     // Product Form Submit
     document.getElementById('productForm').addEventListener('submit', function(e) {
         e.preventDefault();
         saveProduct();
+    });
+    
+    // Category Form Submit
+    document.getElementById('categoryForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        saveCategory();
     });
     
     // Settings Form Save
@@ -48,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             settings = data;
             populateSettingsForm();
+            renderCategoriesTable();
         })
         .catch(error => {
             console.error('Error loading settings:', error);
@@ -109,6 +121,55 @@ document.addEventListener('DOMContentLoaded', function() {
         container.innerHTML = html;
     }
     
+    function renderCategoriesTable() {
+        const container = document.getElementById('categoriesTable');
+        
+        if (!settings.categories || settings.categories.length === 0) {
+            container.innerHTML = '<p class="text-center text-muted">لا توجد تصنيفات حالياً</p>';
+            return;
+        }
+        
+        let html = `
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>الأيقونة</th>
+                            <th>اسم التصنيف</th>
+                            <th>المعرف</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        settings.categories.forEach(category => {
+            html += `
+                <tr>
+                    <td style="font-size: 1.5rem;">${category.icon || '📦'}</td>
+                    <td>${category.name}</td>
+                    <td><span class="badge bg-secondary">${category.id}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editCategory('${category.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteCategory('${category.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+    }
+    
     function openProductModal(product = null) {
         const modal = new bootstrap.Modal(document.getElementById('productModal'));
         const form = document.getElementById('productForm');
@@ -133,6 +194,97 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         modal.show();
+    }
+    
+    function openCategoryModal(category = null) {
+        const modal = new bootstrap.Modal(document.getElementById('categoryModal'));
+        const form = document.getElementById('categoryForm');
+        
+        if (category) {
+            // Editing existing category
+            document.getElementById('categoryModalTitle').textContent = 'تعديل التصنيف';
+            document.getElementById('categoryId').value = category.id;
+            document.getElementById('categoryName').value = category.name;
+            document.getElementById('categoryIcon').value = category.icon || '';
+        } else {
+            // Adding new category
+            document.getElementById('categoryModalTitle').textContent = 'إضافة تصنيف جديد';
+            form.reset();
+            document.getElementById('categoryId').value = '';
+        }
+        
+        modal.show();
+    }
+    
+    function saveCategory() {
+        const categoryId = document.getElementById('categoryId').value || generateCategoryId();
+        const categoryName = document.getElementById('categoryName').value;
+        const categoryIcon = document.getElementById('categoryIcon').value || '📦';
+        
+        const categoryData = {
+            id: categoryId,
+            name: categoryName,
+            icon: categoryIcon
+        };
+        
+        if (!settings.categories) {
+            settings.categories = [];
+        }
+        
+        const isEditing = document.getElementById('categoryId').value !== '';
+        
+        if (isEditing) {
+            // Update existing category
+            const index = settings.categories.findIndex(c => c.id === categoryId);
+            if (index !== -1) {
+                settings.categories[index] = categoryData;
+            }
+        } else {
+            // Add new category
+            settings.categories.push(categoryData);
+        }
+        
+        // Save to server
+        fetch('/api/settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(settings)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert(isEditing ? 'تم تحديث التصنيف بنجاح' : 'تم إضافة التصنيف بنجاح', 'success');
+                renderCategoriesTable();
+                updateProductCategoryOptions();
+                bootstrap.Modal.getInstance(document.getElementById('categoryModal')).hide();
+            } else {
+                throw new Error(data.error || 'خطأ في الحفظ');
+            }
+        })
+        .catch(error => {
+            console.error('Error saving category:', error);
+            showAlert('خطأ في حفظ التصنيف', 'danger');
+        });
+    }
+    
+    function generateCategoryId() {
+        const name = document.getElementById('categoryName').value;
+        return name.toLowerCase().replace(/\s+/g, '_').replace(/[^\w\u0600-\u06FF]/g, '');
+    }
+    
+    function updateProductCategoryOptions() {
+        const categorySelect = document.getElementById('productCategory');
+        if (categorySelect && settings.categories) {
+            categorySelect.innerHTML = '';
+            settings.categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.name;
+                option.textContent = category.name;
+                categorySelect.appendChild(option);
+            });
+        }
     }
     
     function saveProduct() {
@@ -192,6 +344,9 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('primaryColor').value = settings.primary_color || '#87ceeb';
         document.getElementById('fontFamily').value = settings.font_family || 'Cairo';
         
+        // Update categories for product form
+        updateProductCategoryOptions();
+        
         // Social links
         if (settings.social_links) {
             document.getElementById('facebookUrl').value = settings.social_links.facebook?.url || '';
@@ -199,6 +354,9 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('telegramUrl').value = settings.social_links.telegram?.url || '';
             document.getElementById('telegramVisible').checked = settings.social_links.telegram?.visible || false;
         }
+        
+        // Apply current settings to CSS
+        updateCSSVariables();
     }
     
     function saveSettings() {
@@ -280,13 +438,11 @@ document.addEventListener('DOMContentLoaded', function() {
         root.style.setProperty('--primary-color', settings.primary_color);
         root.style.setProperty('--glass-bg', `${settings.primary_color}1a`);
         root.style.setProperty('--glass-border', `${settings.primary_color}4d`);
-        
-        // Update font family
-        document.body.style.fontFamily = `'${settings.font_family}', sans-serif`;
+        root.style.setProperty('--font-family', settings.font_family);
         
         // Load new font if different
         const currentFont = settings.font_family;
-        if (!document.querySelector(`link[href*="${currentFont}"]`)) {
+        if (currentFont && !document.querySelector(`link[href*="${currentFont}"]`)) {
             const fontLink = document.createElement('link');
             fontLink.href = `https://fonts.googleapis.com/css2?family=${currentFont}:wght@200;300;400;600;700&display=swap`;
             fontLink.rel = 'stylesheet';
@@ -319,6 +475,44 @@ document.addEventListener('DOMContentLoaded', function() {
         const product = products.find(p => p.id === id);
         if (product) {
             openProductModal(product);
+        }
+    };
+    
+    // Global functions for category management
+    window.editCategory = function(id) {
+        const category = settings.categories?.find(c => c.id === id);
+        if (category) {
+            openCategoryModal(category);
+        }
+    };
+    
+    window.deleteCategory = function(id) {
+        if (confirm('هل أنت متأكد من حذف هذا التصنيف؟ سيؤثر ذلك على المنتجات المرتبطة به.')) {
+            if (!settings.categories) return;
+            
+            settings.categories = settings.categories.filter(c => c.id !== id);
+            
+            fetch('/api/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(settings)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('تم حذف التصنيف بنجاح', 'success');
+                    renderCategoriesTable();
+                    updateProductCategoryOptions();
+                } else {
+                    throw new Error(data.error || 'خطأ في الحذف');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting category:', error);
+                showAlert('خطأ في حذف التصنيف', 'danger');
+            });
         }
     };
     
@@ -378,6 +572,21 @@ document.addEventListener('DOMContentLoaded', function() {
         root.style.setProperty('--primary-color', color);
         root.style.setProperty('--glass-bg', `${color}1a`);
         root.style.setProperty('--glass-border', `${color}4d`);
+    });
+    
+    // Real-time font preview
+    document.getElementById('fontFamily').addEventListener('change', function() {
+        const font = this.value;
+        const root = document.documentElement;
+        root.style.setProperty('--font-family', font);
+        
+        // Load new font if different
+        if (!document.querySelector(`link[href*="${font}"]`)) {
+            const fontLink = document.createElement('link');
+            fontLink.href = `https://fonts.googleapis.com/css2?family=${font}:wght@200;300;400;600;700&display=swap`;
+            fontLink.rel = 'stylesheet';
+            document.head.appendChild(fontLink);
+        }
     });
     
     // Keyboard shortcuts

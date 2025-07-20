@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ settings.store_name }}</title>
     
-    <!-- Google Fonts - Cairo -->
+    <!-- Google Fonts - Arabic Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Bootstrap 5 RTL -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
@@ -16,6 +18,16 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Dynamic CSS for Settings -->
+    <style>
+        :root {
+            --primary-color: {{ settings.primary_color or '#87ceeb' }};
+            --glass-bg: {{ settings.primary_color or '#87ceeb' }}1a;
+            --glass-border: {{ settings.primary_color or '#87ceeb' }}4d;
+            --font-family: '{{ settings.font_family or 'Cairo' }}';
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -42,6 +54,13 @@
                             <i class="fas fa-th-large me-1"></i>
                             الكل
                         </button>
+                        {% if settings.categories %}
+                            {% for category in settings.categories %}
+                            <button class="btn btn-category" data-category="{{ category.name }}">
+                                {{ category.icon }} {{ category.name }}
+                            </button>
+                            {% endfor %}
+                        {% else %}
                         <button class="btn btn-category" data-category="أولاد">
                             👦 أولاد
                         </button>
@@ -51,6 +70,7 @@
                         <button class="btn btn-category" data-category="شتوي">
                             ❄️ شتوي
                         </button>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -158,6 +178,11 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Store Settings -->
+    <script>
+        window.storeSettings = {{ settings | tojson }};
+    </script>
     
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>

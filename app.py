@@ -82,18 +82,25 @@ def get_default_settings():
     """Return default settings"""
     return {
         "store_name": "مرحبا بكم في متجرنا",
-        "whatsapp_number": "966501234567",
+        "whatsapp_number": "967700000000",
         "primary_color": "#87ceeb",
         "font_family": "Cairo",
+        "currency": "ريال يمني",
+        "categories": [
+            {"id": "boys", "name": "أولاد", "icon": "👦"},
+            {"id": "girls", "name": "بنات", "icon": "👧"},
+            {"id": "winter", "name": "شتوي", "icon": "❄️"}
+        ],
         "social_links": {
             "facebook": {"url": "https://facebook.com", "visible": True},
-            "whatsapp": {"url": "https://wa.me/966501234567", "visible": True},
+            "whatsapp": {"url": "https://wa.me/967700000000", "visible": True},
             "telegram": {"url": "https://t.me/store", "visible": True}
         },
         "delivery_areas": [
-            {"name": "الرياض", "active": True},
-            {"name": "جدة", "active": True},
-            {"name": "الدمام", "active": True}
+            {"name": "صنعاء", "active": True},
+            {"name": "عدن", "active": True},
+            {"name": "تعز", "active": True},
+            {"name": "الحديدة", "active": True}
         ]
     }
 

@@ -99,8 +99,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const productPrice = this.getAttribute('data-product-price');
             const productImage = this.getAttribute('data-product-image');
             
-            // Get WhatsApp number from settings (default if not available)
-            const whatsappNumber = '966501234567'; // This should be loaded from settings
+            // Get WhatsApp number from settings
+            const whatsappNumber = window.storeSettings?.whatsapp_number || '967700000000';
             
             const message = `السلام عليكم
 أريد طلب المنتج التالي:

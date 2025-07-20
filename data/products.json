@@ -2,7 +2,7 @@
   {
     "id": 1,
     "name": "تيشيرت بياقة دائرية",
-    "price": "80 رس",
+    "price": "8000 ريال يمني",
     "category": "أولاد",
     "image": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=300&fit=crop",
     "colors": ["أخضر", "أزرق", "أبيض"],
@@ -13,7 +13,7 @@
   {
     "id": 2,
     "name": "بنطال",
-    "price": "120 رس",
+    "price": "12000 ريال يمني",
     "category": "أولاد",
     "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=300&h=300&fit=crop",
     "colors": ["بيج", "كحلي", "أسود"],
@@ -24,7 +24,7 @@
   {
     "id": 3,
     "name": "تيشيرت",
-    "price": "70 رس",
+    "price": "7000 ريال يمني",
     "category": "بنات",
     "image": "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=300&h=300&fit=crop",
     "colors": ["وردي", "أبيض", "أحمر"],
@@ -35,7 +35,7 @@
   {
     "id": 4,
     "name": "سترة مبطنة",
-    "price": "250 أولاد",
+    "price": "25000 ريال يمني",
     "category": "شتوي",
     "image": "https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=300&h=300&fit=crop",
     "colors": ["أزرق", "أسود", "رمادي"],

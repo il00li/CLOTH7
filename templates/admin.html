@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة التحكم - {{ settings.store_name }}</title>
     
-    <!-- Google Fonts - Cairo -->
+    <!-- Google Fonts - Arabic Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Bootstrap 5 RTL -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
@@ -48,6 +50,11 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab">
                     <i class="fas fa-cog me-1"></i>إعدادات الموقع
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories" type="button" role="tab">
+                    <i class="fas fa-tags me-1"></i>إدارة التصنيفات
                 </button>
             </li>
             <li class="nav-item" role="presentation">
@@ -148,6 +155,21 @@
                 </div>
             </div>
 
+            <!-- Category Management -->
+            <div class="tab-pane fade" id="categories" role="tabpanel">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">إدارة التصنيفات</h5>
+                        <button class="btn btn-primary btn-sm" id="addCategoryBtn">
+                            <i class="fas fa-plus me-1"></i>إضافة تصنيف جديد
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="categoriesTable"></div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Social Media -->
             <div class="tab-pane fade" id="social" role="tabpanel">
                 <div class="card">
@@ -185,6 +207,35 @@
                             </div>
                         </form>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div class="modal fade" id="categoryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="categoryModalTitle">إضافة تصنيف جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="categoryForm">
+                        <input type="hidden" id="categoryId">
+                        <div class="mb-3">
+                            <label class="form-label">اسم التصنيف</label>
+                            <input type="text" class="form-control" id="categoryName" required placeholder="مثال: ملابس رياضية">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">أيقونة التصنيف</label>
+                            <input type="text" class="form-control" id="categoryIcon" placeholder="⚽ أو 🏀 أو أي رمز تعبيري">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary" form="categoryForm">حفظ التصنيف</button>
                 </div>
             </div>
         </div>

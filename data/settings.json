@@ -1,16 +1,56 @@
 {
-  "store_name": "مرحبا بكم في متجرنا",
-  "whatsapp_number": "966501234567",
-  "primary_color": "#87ceeb",
-  "font_family": "Cairo",
-  "social_links": {
-    "facebook": {"url": "https://facebook.com", "visible": true},
-    "whatsapp": {"url": "https://wa.me/966501234567", "visible": true},
-    "telegram": {"url": "https://t.me/store", "visible": true}
-  },
+  "categories": [
+    {
+      "id": "boys",
+      "name": "ولادي",
+      "icon": "👻"
+    },
+    {
+      "icon": "👧",
+      "id": "girls",
+      "name": "بنات"
+    },
+    {
+      "icon": "❄️",
+      "id": "winter",
+      "name": "شتوي"
+    }
+  ],
+  "currency": "ريال يمني",
   "delivery_areas": [
-    {"name": "الرياض", "active": true},
-    {"name": "جدة", "active": true},
-    {"name": "الدمام", "active": true}
-  ]
+    {
+      "active": true,
+      "name": "صنعاء"
+    },
+    {
+      "active": true,
+      "name": "عدن"
+    },
+    {
+      "active": true,
+      "name": "تعز"
+    },
+    {
+      "active": true,
+      "name": "الحديدة"
+    }
+  ],
+  "font_family": "Cairo",
+  "primary_color": "#87ceeb",
+  "social_links": {
+    "facebook": {
+      "url": "https://facebook.com",
+      "visible": true
+    },
+    "telegram": {
+      "url": "https://t.me/store",
+      "visible": true
+    },
+    "whatsapp": {
+      "url": "https://wa.me/967783154638",
+      "visible": true
+    }
+  },
+  "store_name": "مرحبا بكم في متجرنا",
+  "whatsapp_number": "967783154638"
 }
