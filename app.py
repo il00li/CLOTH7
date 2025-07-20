@@ -66,7 +66,7 @@ def get_or_create_settings():
         # Set default social links
         settings.set_social_links({
             "facebook": {"url": "", "visible": False},
-            "whatsapp": {"url": "", "visible": True},
+            "whatsapp": {"url": f"https://wa.me/{settings.whatsapp_number}", "visible": True},
             "telegram": {"url": "", "visible": False}
         })
         # Set default delivery areas
@@ -84,35 +84,6 @@ with app.app_context():
     # Import models after db is initialized
     import models
     db.create_all()
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def get_or_create_settings():
-    """Get settings from database or create default"""
-    settings = models.Settings.query.first()
-    if not settings:
-        settings = models.Settings()
-        settings.set_categories([
-            {"id": "boys", "name": "أولاد", "icon": "👦"},
-            {"id": "girls", "name": "بنات", "icon": "👧"},
-            {"id": "winter", "name": "شتوي", "icon": "❄️"}
-        ])
-        settings.set_social_links({
-            "facebook": {"url": "https://facebook.com", "visible": True},
-            "whatsapp": {"url": "https://wa.me/967700000000", "visible": True},
-            "telegram": {"url": "https://t.me/store", "visible": True}
-        })
-        settings.set_delivery_areas([
-            {"name": "صنعاء", "active": True},
-            {"name": "عدن", "active": True},
-            {"name": "تعز", "active": True},
-            {"name": "الحديدة", "active": True}
-        ])
-        db.session.add(settings)
-        db.session.commit()
-    return settings
 
 def get_default_products():
     """Return default products matching the image"""
