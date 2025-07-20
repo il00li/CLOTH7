@@ -1,0 +1,16 @@
+{
+  "store_name": "مرحبا بكم في متجرنا",
+  "whatsapp_number": "966501234567",
+  "primary_color": "#87ceeb",
+  "font_family": "Cairo",
+  "social_links": {
+    "facebook": {"url": "https://facebook.com", "visible": true},
+    "whatsapp": {"url": "https://wa.me/966501234567", "visible": true},
+    "telegram": {"url": "https://t.me/store", "visible": true}
+  },
+  "delivery_areas": [
+    {"name": "الرياض", "active": true},
+    {"name": "جدة", "active": true},
+    {"name": "الدمام", "active": true}
+  ]
+}

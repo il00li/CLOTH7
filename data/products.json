@@ -1,0 +1,46 @@
+[
+  {
+    "id": 1,
+    "name": "تيشيرت بياقة دائرية",
+    "price": "80 رس",
+    "category": "أولاد",
+    "image": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=300&fit=crop",
+    "colors": ["أخضر", "أزرق", "أبيض"],
+    "sizes": ["S", "M", "L", "XL"],
+    "material": "قطن 100%",
+    "description": "تيشيرت مريح بياقة دائرية مناسب للاستخدام اليومي"
+  },
+  {
+    "id": 2,
+    "name": "بنطال",
+    "price": "120 رس",
+    "category": "أولاد",
+    "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=300&h=300&fit=crop",
+    "colors": ["بيج", "كحلي", "أسود"],
+    "sizes": ["S", "M", "L", "XL"],
+    "material": "قطن وبوليستر",
+    "description": "بنطال كاجوال أنيق ومريح"
+  },
+  {
+    "id": 3,
+    "name": "تيشيرت",
+    "price": "70 رس",
+    "category": "بنات",
+    "image": "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=300&h=300&fit=crop",
+    "colors": ["وردي", "أبيض", "أحمر"],
+    "sizes": ["S", "M", "L"],
+    "material": "قطن ناعم",
+    "description": "تيشيرت نسائي عملي وأنيق"
+  },
+  {
+    "id": 4,
+    "name": "سترة مبطنة",
+    "price": "250 أولاد",
+    "category": "شتوي",
+    "image": "https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=300&h=300&fit=crop",
+    "colors": ["أزرق", "أسود", "رمادي"],
+    "sizes": ["S", "M", "L", "XL"],
+    "material": "بوليستر مقاوم للماء",
+    "description": "سترة شتوية دافئة ومقاومة للرياح"
+  }
+]
