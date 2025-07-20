@@ -18,9 +18,10 @@ Preferred communication style: Simple, everyday language.
 
 ### Backend Architecture
 - **Framework**: Flask (Python) with session management
-- **Data Storage**: JSON files for products and settings (file-based storage)
+- **Database**: PostgreSQL with SQLAlchemy ORM for data persistence
 - **Authentication**: Simple session-based admin authentication
-- **API**: RESTful endpoints for CRUD operations on products and settings
+- **File Upload**: Secure image upload with file validation
+- **API**: RESTful endpoints for CRUD operations on products, settings, and delivery areas
 
 ## Key Components
 
@@ -32,8 +33,9 @@ Preferred communication style: Simple, everyday language.
 - `data/`: JSON files for persistent data storage
 
 ### Data Models
-- **Products**: ID, name, price, category, image URL, colors, sizes, material, description
-- **Settings**: Store configuration including name, WhatsApp number, colors, social links, delivery areas
+- **Products**: ID, name, price, category, image path, colors, sizes, material, description (PostgreSQL table)
+- **Settings**: Store configuration including name, WhatsApp number, colors, social links, delivery areas (PostgreSQL table)
+- **Delivery Areas**: Managed collection with ID, name, and active status for order management
 
 ### User Interface Components
 - **Customer Storefront**: Product catalog with category filtering, responsive card layout
@@ -55,9 +57,10 @@ Preferred communication style: Simple, everyday language.
 4. Real-time updates to JSON data files
 
 ### Data Persistence
-- Products stored in `data/products.json`
-- Settings stored in `data/settings.json`
-- File-based storage with JSON encoding for Arabic text support
+- PostgreSQL database with proper Arabic text encoding (UTF-8)
+- SQLAlchemy ORM for database operations and migrations
+- Secure file upload system for product images in `/static/uploads/`
+- Environment-based configuration for database connections
 
 ## External Dependencies
 

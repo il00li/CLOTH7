@@ -71,10 +71,10 @@ def get_or_create_settings():
         })
         # Set default delivery areas
         settings.set_delivery_areas([
-            {"name": "صنعاء", "active": True},
-            {"name": "عدن", "active": True},
-            {"name": "تعز", "active": True},
-            {"name": "الحديدة", "active": True}
+            {"id": 1, "name": "صنعاء", "active": True},
+            {"id": 2, "name": "عدن", "active": True},
+            {"id": 3, "name": "تعز", "active": True},
+            {"id": 4, "name": "الحديدة", "active": True}
         ])
         db.session.add(settings)
         db.session.commit()
@@ -397,7 +397,12 @@ def handle_delivery_areas():
     """Handle delivery areas management"""
     if request.method == 'GET':
         settings = get_or_create_settings()
-        return jsonify(settings.get_delivery_areas())
+        areas = settings.get_delivery_areas()
+        # Ensure each area has an ID
+        for i, area in enumerate(areas):
+            if 'id' not in area:
+                area['id'] = i + 1
+        return jsonify(areas)
     
     elif request.method == 'POST':
         if not session.get('admin_logged_in'):
@@ -407,16 +412,34 @@ def handle_delivery_areas():
         settings = get_or_create_settings()
         areas = settings.get_delivery_areas()
         
-        if 'id' in area_data:
+        # Ensure areas have IDs
+        for i, area in enumerate(areas):
+            if 'id' not in area:
+                area['id'] = i + 1
+        
+        if 'id' in area_data and area_data['id']:
             # Update existing area
-            for area in areas:
+            found = False
+            for i, area in enumerate(areas):
                 if area.get('id') == area_data['id']:
-                    area.update(area_data)
+                    areas[i] = {
+                        'id': area_data['id'],
+                        'name': area_data['name'],
+                        'active': area_data['active']
+                    }
+                    found = True
                     break
+            if not found:
+                return jsonify({'error': 'المنطقة غير موجودة'}), 404
         else:
             # Add new area
-            area_data['id'] = len(areas) + 1
-            areas.append(area_data)
+            new_id = max([area.get('id', 0) for area in areas] + [0]) + 1
+            new_area = {
+                'id': new_id,
+                'name': area_data['name'],
+                'active': area_data['active']
+            }
+            areas.append(new_area)
         
         settings.set_delivery_areas(areas)
         db.session.commit()
@@ -429,6 +452,8 @@ def handle_delivery_areas():
         area_id = request.json.get('id')
         settings = get_or_create_settings()
         areas = settings.get_delivery_areas()
+        
+        # Remove area with matching ID
         areas = [area for area in areas if area.get('id') != area_id]
         
         settings.set_delivery_areas(areas)

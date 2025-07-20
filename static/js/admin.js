@@ -40,6 +40,19 @@ document.addEventListener('DOMContentLoaded', function() {
         saveSocialSettings();
     });
     
+    // Image Upload Button
+    document.getElementById('uploadImageBtn').addEventListener('click', function() {
+        uploadProductImage();
+    });
+    
+    // Image file change handler
+    document.getElementById('productImageFile').addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            previewImage(file);
+        }
+    });
+    
     function loadProducts() {
         fetch('/api/products')
         .then(response => response.json())
@@ -518,20 +531,17 @@ document.addEventListener('DOMContentLoaded', function() {
     
     window.deleteProduct = function(id) {
         if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
-            products = products.filter(p => p.id !== id);
-            
-            fetch('/api/products', {
-                method: 'POST',
+            fetch(`/api/products/${id}`, {
+                method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(products)
+                }
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     showAlert('تم حذف المنتج بنجاح', 'success');
-                    renderProductsTable();
+                    loadProducts(); // Reload products from server
                 } else {
                     throw new Error(data.error || 'خطأ في الحذف');
                 }
@@ -603,4 +613,62 @@ document.addEventListener('DOMContentLoaded', function() {
             saveSettings();
         }
     });
+    
+    // Image upload functions
+    function uploadProductImage() {
+        const fileInput = document.getElementById('productImageFile');
+        const file = fileInput.files[0];
+        
+        if (!file) {
+            showAlert('يرجى اختيار صورة أولاً', 'warning');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const uploadBtn = document.getElementById('uploadImageBtn');
+        const originalText = uploadBtn.textContent;
+        uploadBtn.textContent = 'جاري الرفع...';
+        uploadBtn.disabled = true;
+        
+        fetch('/upload_image', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('productImage').value = data.image_url;
+                showImagePreview(data.image_url);
+                showAlert('تم رفع الصورة بنجاح', 'success');
+            } else {
+                showAlert(data.error || 'خطأ في رفع الصورة', 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error uploading image:', error);
+            showAlert('خطأ في رفع الصورة', 'danger');
+        })
+        .finally(() => {
+            uploadBtn.textContent = originalText;
+            uploadBtn.disabled = false;
+        });
+    }
+    
+    function previewImage(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            showImagePreview(e.target.result);
+        };
+        reader.readAsDataURL(file);
+    }
+    
+    function showImagePreview(src) {
+        const previewDiv = document.getElementById('imagePreview');
+        const img = previewDiv.querySelector('img');
+        
+        img.src = src;
+        previewDiv.style.display = 'block';
+    }
 });

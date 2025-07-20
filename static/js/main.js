@@ -102,12 +102,28 @@ document.addEventListener('DOMContentLoaded', function() {
             // Get WhatsApp number from settings
             const whatsappNumber = window.storeSettings?.whatsapp_number || '967700000000';
             
-            const message = `السلام عليكم
+            // Get product details from the card
+            const productCard = this.closest('.product-card');
+            const material = productCard.querySelector('.product-material')?.textContent || '';
+            const colors = productCard.querySelector('.product-colors')?.textContent || '';
+            const sizes = productCard.querySelector('.product-sizes')?.textContent || '';
+            const description = productCard.querySelector('.product-description')?.textContent || '';
+            
+            const message = `السلام عليكم ورحمة الله وبركاته
+
 أريد طلب المنتج التالي:
 
-📦 اسم المنتج: ${productName}
-💰 السعر: ${productPrice}
-🖼️ صورة المنتج: ${productImage}
+📦 *اسم المنتج:* ${productName}
+💰 *السعر:* ${productPrice}
+🧵 *الخامة:* ${material}
+🎨 *الألوان المتاحة:* ${colors}
+📏 *المقاسات المتاحة:* ${sizes}
+📝 *الوصف:* ${description}
+
+🖼️ *صورة المنتج:*
+${productImage}
+
+أرجو التواصل معي لتأكيد الطلب وتفاصيل التوصيل.
 
 شكراً لكم`;
             
