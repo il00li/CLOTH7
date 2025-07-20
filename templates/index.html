@@ -87,7 +87,7 @@
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4 product-item" data-category="{{ product.category }}">
                     <div class="product-card">
                         <div class="product-image">
-                            <img src="{{ product.image_path or product.image }}" alt="{{ product.name }}" class="img-fluid" 
+                            <img src="{{ product.image_path if product.image_path else 'https://via.placeholder.com/300x300?text=صورة+غير+متوفرة' }}" alt="{{ product.name }}" class="img-fluid" 
                                  onerror="this.src='https://via.placeholder.com/300x300?text=صورة+غير+متوفرة';">
                         </div>
                         <div class="product-info">
@@ -112,9 +112,9 @@
                                 <button class="btn btn-success btn-sm btn-order" 
                                         data-product-name="{{ product.name }}"
                                         data-product-price="{{ product.price }}"
-                                        data-product-image="{{ product.image }}"
-                                        data-product-colors="{{ product.colors }}"
-                                        data-product-sizes="{{ product.sizes }}"
+                                        data-product-image="{{ product.image_path }}"
+                                        data-product-colors="{{ product.colors | join(', ') }}"
+                                        data-product-sizes="{{ product.sizes | join(', ') }}"
                                         data-product-material="{{ product.material }}"
                                         data-product-description="{{ product.description }}">
                                     <i class="fab fa-whatsapp me-1"></i>
