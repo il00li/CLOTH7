@@ -330,14 +330,15 @@
                                 <div class="mb-3">
                                     <label class="form-label">صورة المنتج</label>
                                     <div class="input-group">
-                                        <input type="file" class="form-control" id="productImageFile" accept="image/*">
+                                        <input type="file" class="form-control" id="productImageFile" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp">
                                         <button type="button" class="btn btn-outline-secondary" id="uploadImageBtn">رفع</button>
                                     </div>
-                                    <small class="text-muted">أو</small>
-                                    <input type="url" class="form-control mt-1" id="productImage" placeholder="رابط الصورة">
-                                    <div id="imagePreview" class="mt-2" style="display: none;">
-                                        <img src="" alt="معاينة الصورة" style="max-width: 100px; height: auto;">
+                                    <small class="text-muted">الحد الأقصى: 16 ميجابايت - الأنواع المدعومة: JPG, PNG, GIF, WebP</small>
+                                    <div class="mt-2">
+                                        <small class="text-muted">أو أدخل رابط الصورة:</small>
+                                        <input type="url" class="form-control mt-1" id="productImage" placeholder="https://example.com/image.jpg">
                                     </div>
+                                    <div id="imagePreview" class="mt-2" style="display: none;"></div>
                                 </div>
                             </div>
                         </div>

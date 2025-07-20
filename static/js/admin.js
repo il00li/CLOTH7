@@ -615,6 +615,19 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Check file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            showAlert('نوع الملف غير مدعوم. يرجى اختيار صورة (JPG, PNG, GIF, WebP)', 'danger');
+            return;
+        }
+        
+        // Check file size (16MB max)
+        if (file.size > 16 * 1024 * 1024) {
+            showAlert('حجم الملف كبير جداً. الحد الأقصى 16 ميجابايت', 'danger');
+            return;
+        }
+        
         const formData = new FormData();
         formData.append('file', file);
         
@@ -627,19 +640,26 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 document.getElementById('productImage').value = data.image_url;
                 showImagePreview(data.image_url);
                 showAlert('تم رفع الصورة بنجاح', 'success');
+                // Clear the file input
+                fileInput.value = '';
             } else {
-                showAlert(data.error || 'خطأ في رفع الصورة', 'danger');
+                throw new Error(data.error || 'خطأ في رفع الصورة');
             }
         })
         .catch(error => {
             console.error('Error uploading image:', error);
-            showAlert('خطأ في رفع الصورة', 'danger');
+            showAlert(error.message || 'خطأ في رفع الصورة', 'danger');
         })
         .finally(() => {
             uploadBtn.textContent = originalText;
@@ -657,9 +677,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function showImagePreview(src) {
         const previewDiv = document.getElementById('imagePreview');
-        const img = previewDiv.querySelector('img');
+        let img = previewDiv.querySelector('img');
+        
+        if (!img) {
+            img = document.createElement('img');
+            img.style.cssText = 'max-width: 150px; max-height: 150px; object-fit: cover; border-radius: 8px; border: 2px solid #ddd;';
+            img.alt = 'معاينة الصورة';
+            previewDiv.appendChild(img);
+        }
         
         img.src = src;
         previewDiv.style.display = 'block';
+        
+        // Add error handling for broken images
+        img.onerror = function() {
+            showAlert('فشل في تحميل الصورة', 'warning');
+            previewDiv.style.display = 'none';
+        };
     }
 });

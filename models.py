@@ -16,7 +16,6 @@ class Product(db.Model):
     description: Mapped[str] = mapped_column(Text, nullable=True)
     colors_json: Mapped[str] = mapped_column(Text, nullable=True)
     sizes_json: Mapped[str] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(db.DateTime, default=datetime.utcnow)
 
     def set_colors(self, colors):
         """تحديد الألوان المتوفرة"""
@@ -91,7 +90,6 @@ class StoreSettings(db.Model):
     categories_json: Mapped[str] = mapped_column(Text, nullable=True)
     social_links_json: Mapped[str] = mapped_column(Text, nullable=True)
     delivery_areas_json: Mapped[str] = mapped_column(Text, nullable=True)
-    updated_at: Mapped[datetime] = mapped_column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def set_categories(self, categories):
         """تحديد الفئات"""

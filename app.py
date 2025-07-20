@@ -346,29 +346,46 @@ def upload_image():
     if not session.get('admin_logged_in'):
         return jsonify({'error': 'غير مصرح'}), 403
     
-    if 'file' not in request.files:
-        return jsonify({'error': 'لم يتم اختيار ملف'}), 400
-    
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'لم يتم اختيار ملف'}), 400
-    
-    if file and allowed_file(file.filename):
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'لم يتم اختيار ملف'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'لم يتم اختيار ملف'}), 400
+        
+        if not file:
+            return jsonify({'error': 'ملف غير صالح'}), 400
+            
+        if not allowed_file(file.filename):
+            return jsonify({'error': 'نوع الملف غير مدعوم. الأنواع المدعومة: PNG, JPG, JPEG, GIF, WebP'}), 400
+        
+        # Secure the filename and add timestamp
         filename = secure_filename(file.filename)
-        # Add timestamp to avoid conflicts
+        if not filename:
+            return jsonify({'error': 'اسم الملف غير صالح'}), 400
+            
         import time
         timestamp = str(int(time.time()))
-        name, ext = filename.rsplit('.', 1)
-        filename = f"{name}_{timestamp}.{ext}"
+        name, ext = filename.rsplit('.', 1) if '.' in filename else (filename, 'jpg')
+        filename = f"{name}_{timestamp}.{ext.lower()}"
         
+        # Save the file
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
         
+        # Verify file was saved
+        if not os.path.exists(file_path):
+            return jsonify({'error': 'فشل في حفظ الملف'}), 500
+        
         # Return the URL path for the image
         image_url = url_for('static', filename=f'uploads/{filename}')
+        logging.info(f"Image uploaded successfully: {image_url}")
         return jsonify({'success': True, 'image_url': image_url})
-    
-    return jsonify({'error': 'نوع الملف غير مدعوم'}), 400
+        
+    except Exception as e:
+        logging.error(f"Error uploading image: {str(e)}")
+        return jsonify({'error': f'خطأ في رفع الصورة: {str(e)}'}), 500
 
 @app.route('/api/delivery_areas', methods=['GET', 'POST', 'DELETE'])
 def handle_delivery_areas():
