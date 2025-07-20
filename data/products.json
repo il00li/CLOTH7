@@ -1,46 +1,81 @@
 [
   {
+    "category": "أولاد",
+    "colors": [
+      "أخضر",
+      "أزرق",
+      "أبيض"
+    ],
+    "description": "تيشيرت مريح بياقة دائرية مناسب للاستخدام اليومي",
     "id": 1,
+    "image": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=300&fit=crop",
+    "material": "قطن 100%",
     "name": "تيشيرت بياقة دائرية",
     "price": "8000 ريال يمني",
-    "category": "أولاد",
-    "image": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=300&fit=crop",
-    "colors": ["أخضر", "أزرق", "أبيض"],
-    "sizes": ["S", "M", "L", "XL"],
-    "material": "قطن 100%",
-    "description": "تيشيرت مريح بياقة دائرية مناسب للاستخدام اليومي"
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ]
   },
   {
+    "category": "أولاد",
+    "colors": [
+      "بيج",
+      "كحلي",
+      "أسود"
+    ],
+    "description": "بنطال كاجوال أنيق ومريح",
     "id": 2,
+    "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=300&h=300&fit=crop",
+    "material": "قطن وبوليستر",
     "name": "بنطال",
     "price": "12000 ريال يمني",
-    "category": "أولاد",
-    "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=300&h=300&fit=crop",
-    "colors": ["بيج", "كحلي", "أسود"],
-    "sizes": ["S", "M", "L", "XL"],
-    "material": "قطن وبوليستر",
-    "description": "بنطال كاجوال أنيق ومريح"
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ]
   },
   {
-    "id": 3,
+    "id": "3",
     "name": "تيشيرت",
     "price": "7000 ريال يمني",
     "category": "بنات",
     "image": "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=300&h=300&fit=crop",
-    "colors": ["وردي", "أبيض", "أحمر"],
-    "sizes": ["S", "M", "L"],
+    "colors": [
+      "وردي",
+      "أبيض",
+      "أحمر"
+    ],
+    "sizes": [
+      "S",
+      "M",
+      "L"
+    ],
     "material": "قطن ناعم",
-    "description": "تيشيرت نسائي عملي وأنيق"
+    "description": "T-SHIRT "
   },
   {
+    "category": "شتوي",
+    "colors": [
+      "أزرق",
+      "أسود",
+      "رمادي"
+    ],
+    "description": "سترة شتوية دافئة ومقاومة للرياح",
     "id": 4,
+    "image": "https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=300&h=300&fit=crop",
+    "material": "بوليستر مقاوم للماء",
     "name": "سترة مبطنة",
     "price": "25000 ريال يمني",
-    "category": "شتوي",
-    "image": "https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=300&h=300&fit=crop",
-    "colors": ["أزرق", "أسود", "رمادي"],
-    "sizes": ["S", "M", "L", "XL"],
-    "material": "بوليستر مقاوم للماء",
-    "description": "سترة شتوية دافئة ومقاومة للرياح"
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ]
   }
 ]

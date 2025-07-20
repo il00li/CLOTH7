@@ -1,9 +1,9 @@
 {
   "categories": [
     {
+      "icon": "👻",
       "id": "boys",
-      "name": "ولادي",
-      "icon": "👻"
+      "name": "ولادي"
     },
     {
       "icon": "👧",
@@ -35,7 +35,7 @@
       "name": "الحديدة"
     }
   ],
-  "font_family": "Cairo",
+  "font_family": "Tajawal",
   "primary_color": "#87ceeb",
   "social_links": {
     "facebook": {
@@ -52,5 +52,5 @@
     }
   },
   "store_name": "مرحبا بكم في متجرنا",
-  "whatsapp_number": "967783154638"
+  "whatsapp_number": "967783154638+"
 }

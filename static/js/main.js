@@ -241,4 +241,43 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     `;
     document.head.appendChild(style);
+    
+    // Load delivery areas when modal is opened
+    const deliveryModal = document.getElementById('deliveryModal');
+    if (deliveryModal) {
+        deliveryModal.addEventListener('show.bs.modal', loadDeliveryAreas);
+    }
 });
+
+// Function to load delivery areas
+function loadDeliveryAreas() {
+    const deliveryAreasList = document.getElementById('deliveryAreasList');
+    
+    fetch('/api/delivery_areas')
+        .then(response => response.json())
+        .then(areas => {
+            if (areas.length === 0) {
+                deliveryAreasList.innerHTML = '<p class="text-center text-muted">لا توجد مناطق توصيل محددة حالياً</p>';
+                return;
+            }
+            
+            let html = '';
+            areas.forEach(area => {
+                const statusClass = area.active ? 'delivery-area-active' : 'delivery-area-inactive';
+                const statusText = area.active ? 'متاح' : 'غير متاح';
+                
+                html += `
+                    <div class="delivery-area-item">
+                        <span class="delivery-area-name">${area.name}</span>
+                        <span class="delivery-area-status ${statusClass}">${statusText}</span>
+                    </div>
+                `;
+            });
+            
+            deliveryAreasList.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error loading delivery areas:', error);
+            deliveryAreasList.innerHTML = '<p class="text-center text-danger">حدث خطأ في تحميل مناطق التوصيل</p>';
+        });
+}

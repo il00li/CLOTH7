@@ -1,33 +1,118 @@
 import os
 import json
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import DeclarativeBase
+from werkzeug.utils import secure_filename
+from werkzeug.middleware.proxy_fix import ProxyFix
 import logging
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
+class Base(DeclarativeBase):
+    pass
+
+db = SQLAlchemy(model_class=Base)
+
+# create the app
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "your-secret-key-here")
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
-# Data file paths
-PRODUCTS_FILE = 'data/products.json'
-SETTINGS_FILE = 'data/settings.json'
+# configure the database
+database_url = os.environ.get("DATABASE_URL")
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url or "sqlite:///store.db"
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+}
 
-def load_json_file(filename):
-    """Load JSON data from file"""
-    try:
-        with open(filename, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return {}
-    except json.JSONDecodeError:
-        return {}
+# File upload configuration
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
-def save_json_file(filename, data):
-    """Save JSON data to file"""
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
-    with open(filename, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+# initialize the app with the extension
+db.init_app(app)
+
+# Ensure upload directory exists
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def get_or_create_settings():
+    """Get existing settings or create default ones"""
+    settings = models.StoreSettings.query.first()
+    if not settings:
+        settings = models.StoreSettings(
+            store_name="متجر الملابس العربي",
+            whatsapp_number="967700000000",
+            primary_color="#87ceeb",
+            font_family="Cairo",
+            currency="ريال يمني"
+        )
+        # Set default categories
+        settings.set_categories([
+            {"name": "أولاد", "icon": "👦", "active": True},
+            {"name": "بنات", "icon": "👧", "active": True},
+            {"name": "شتوي", "icon": "🧥", "active": True}
+        ])
+        # Set default social links
+        settings.set_social_links({
+            "facebook": {"url": "", "visible": False},
+            "whatsapp": {"url": "", "visible": True},
+            "telegram": {"url": "", "visible": False}
+        })
+        # Set default delivery areas
+        settings.set_delivery_areas([
+            {"name": "صنعاء", "active": True},
+            {"name": "عدن", "active": True},
+            {"name": "تعز", "active": True},
+            {"name": "الحديدة", "active": True}
+        ])
+        db.session.add(settings)
+        db.session.commit()
+    return settings
+
+with app.app_context():
+    # Import models after db is initialized
+    import models
+    db.create_all()
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def get_or_create_settings():
+    """Get settings from database or create default"""
+    settings = models.Settings.query.first()
+    if not settings:
+        settings = models.Settings()
+        settings.set_categories([
+            {"id": "boys", "name": "أولاد", "icon": "👦"},
+            {"id": "girls", "name": "بنات", "icon": "👧"},
+            {"id": "winter", "name": "شتوي", "icon": "❄️"}
+        ])
+        settings.set_social_links({
+            "facebook": {"url": "https://facebook.com", "visible": True},
+            "whatsapp": {"url": "https://wa.me/967700000000", "visible": True},
+            "telegram": {"url": "https://t.me/store", "visible": True}
+        })
+        settings.set_delivery_areas([
+            {"name": "صنعاء", "active": True},
+            {"name": "عدن", "active": True},
+            {"name": "تعز", "active": True},
+            {"name": "الحديدة", "active": True}
+        ])
+        db.session.add(settings)
+        db.session.commit()
+    return settings
 
 def get_default_products():
     """Return default products matching the image"""
@@ -107,17 +192,40 @@ def get_default_settings():
 @app.route('/')
 def index():
     """Main store page"""
-    products = load_json_file(PRODUCTS_FILE)
+    products = models.Product.query.all()
     if not products:
-        products = get_default_products()
-        save_json_file(PRODUCTS_FILE, products)
+        # Create default products
+        default_products = get_default_products()
+        for prod_data in default_products:
+            product = models.Product(
+                name=prod_data['name'],
+                price=prod_data['price'],
+                category=prod_data['category'],
+                image_path=prod_data['image'],
+                material=prod_data['material'],
+                description=prod_data['description']
+            )
+            product.set_colors(prod_data['colors'])
+            product.set_sizes(prod_data['sizes'])
+            db.session.add(product)
+        db.session.commit()
+        products = models.Product.query.all()
     
-    settings = load_json_file(SETTINGS_FILE)
-    if not settings:
-        settings = get_default_settings()
-        save_json_file(SETTINGS_FILE, settings)
+    settings = get_or_create_settings()
     
-    return render_template('index.html', products=products, settings=settings)
+    # Convert settings to dictionary for template
+    settings_dict = {
+        'store_name': settings.store_name,
+        'whatsapp_number': settings.whatsapp_number,
+        'primary_color': settings.primary_color,
+        'font_family': settings.font_family,
+        'currency': settings.currency,
+        'categories': settings.get_categories(),
+        'social_links': settings.get_social_links(),
+        'delivery_areas': settings.get_delivery_areas()
+    }
+    
+    return render_template('index.html', products=products, settings=settings_dict)
 
 @app.route('/admin_login', methods=['POST'])
 def admin_login():
@@ -134,15 +242,22 @@ def admin():
     if not session.get('admin_logged_in'):
         return redirect(url_for('index'))
     
-    products = load_json_file(PRODUCTS_FILE)
-    if not products:
-        products = get_default_products()
+    products = models.Product.query.all()
+    settings = get_or_create_settings()
     
-    settings = load_json_file(SETTINGS_FILE)
-    if not settings:
-        settings = get_default_settings()
+    # Convert to dictionary format for template
+    settings_dict = {
+        'store_name': settings.store_name,
+        'whatsapp_number': settings.whatsapp_number,
+        'primary_color': settings.primary_color,
+        'font_family': settings.font_family,
+        'currency': settings.currency,
+        'categories': settings.get_categories(),
+        'social_links': settings.get_social_links(),
+        'delivery_areas': settings.get_delivery_areas()
+    }
     
-    return render_template('admin.html', products=products, settings=settings)
+    return render_template('admin.html', products=products, settings=settings_dict)
 
 @app.route('/admin/logout')
 def admin_logout():
@@ -154,49 +269,209 @@ def admin_logout():
 def handle_products():
     """Handle products API"""
     if request.method == 'GET':
-        products = load_json_file(PRODUCTS_FILE)
-        if not products:
-            products = get_default_products()
-        return jsonify(products)
+        products = models.Product.query.all()
+        products_data = []
+        for product in products:
+            products_data.append({
+                'id': product.id,
+                'name': product.name,
+                'price': product.price,
+                'category': product.category,
+                'image': product.image_path,
+                'colors': product.get_colors(),
+                'sizes': product.get_sizes(),
+                'material': product.material,
+                'description': product.description
+            })
+        return jsonify(products_data)
     
     elif request.method == 'POST':
         if not session.get('admin_logged_in'):
             return jsonify({'error': 'غير مصرح'}), 403
         
-        products = request.json
-        save_json_file(PRODUCTS_FILE, products)
+        # This handles saving a single product
+        product_data = request.json
+        
+        if 'id' in product_data and product_data['id']:
+            # Update existing product
+            product = models.Product.query.get(product_data['id'])
+            if product:
+                product.name = product_data['name']
+                product.price = product_data['price']
+                product.category = product_data['category']
+                product.image_path = product_data.get('image', product.image_path)
+                product.material = product_data['material']
+                product.description = product_data['description']
+                product.set_colors(product_data['colors'])
+                product.set_sizes(product_data['sizes'])
+        else:
+            # Create new product
+            product = models.Product(
+                name=product_data['name'],
+                price=product_data['price'],
+                category=product_data['category'],
+                image_path=product_data.get('image', ''),
+                material=product_data['material'],
+                description=product_data['description']
+            )
+            product.set_colors(product_data['colors'])
+            product.set_sizes(product_data['sizes'])
+            db.session.add(product)
+        
+        db.session.commit()
         return jsonify({'success': True})
 
 @app.route('/api/settings', methods=['GET', 'POST'])
 def handle_settings():
     """Handle settings API"""
     if request.method == 'GET':
-        settings = load_json_file(SETTINGS_FILE)
-        if not settings:
-            settings = get_default_settings()
-        return jsonify(settings)
+        settings = get_or_create_settings()
+        settings_dict = {
+            'store_name': settings.store_name,
+            'whatsapp_number': settings.whatsapp_number,
+            'primary_color': settings.primary_color,
+            'font_family': settings.font_family,
+            'currency': settings.currency,
+            'categories': settings.get_categories(),
+            'social_links': settings.get_social_links(),
+            'delivery_areas': settings.get_delivery_areas()
+        }
+        return jsonify(settings_dict)
     
     elif request.method == 'POST':
         if not session.get('admin_logged_in'):
             return jsonify({'error': 'غير مصرح'}), 403
         
-        settings = request.json
-        save_json_file(SETTINGS_FILE, settings)
+        settings_data = request.json
+        settings = get_or_create_settings()
+        
+        # Update settings
+        settings.store_name = settings_data.get('store_name', settings.store_name)
+        settings.whatsapp_number = settings_data.get('whatsapp_number', settings.whatsapp_number)
+        settings.primary_color = settings_data.get('primary_color', settings.primary_color)
+        settings.font_family = settings_data.get('font_family', settings.font_family)
+        settings.currency = settings_data.get('currency', settings.currency)
+        
+        if 'categories' in settings_data:
+            settings.set_categories(settings_data['categories'])
+        if 'social_links' in settings_data:
+            settings.set_social_links(settings_data['social_links'])
+        if 'delivery_areas' in settings_data:
+            settings.set_delivery_areas(settings_data['delivery_areas'])
+        
+        db.session.commit()
         return jsonify({'success': True})
+
+@app.route('/upload_image', methods=['POST'])
+def upload_image():
+    """Handle image upload"""
+    if not session.get('admin_logged_in'):
+        return jsonify({'error': 'غير مصرح'}), 403
+    
+    if 'file' not in request.files:
+        return jsonify({'error': 'لم يتم اختيار ملف'}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'لم يتم اختيار ملف'}), 400
+    
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        # Add timestamp to avoid conflicts
+        import time
+        timestamp = str(int(time.time()))
+        name, ext = filename.rsplit('.', 1)
+        filename = f"{name}_{timestamp}.{ext}"
+        
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+        
+        # Return the URL path for the image
+        image_url = url_for('static', filename=f'uploads/{filename}')
+        return jsonify({'success': True, 'image_url': image_url})
+    
+    return jsonify({'error': 'نوع الملف غير مدعوم'}), 400
+
+@app.route('/api/delivery_areas', methods=['GET', 'POST', 'DELETE'])
+def handle_delivery_areas():
+    """Handle delivery areas management"""
+    if request.method == 'GET':
+        settings = get_or_create_settings()
+        return jsonify(settings.get_delivery_areas())
+    
+    elif request.method == 'POST':
+        if not session.get('admin_logged_in'):
+            return jsonify({'error': 'غير مصرح'}), 403
+        
+        area_data = request.json
+        settings = get_or_create_settings()
+        areas = settings.get_delivery_areas()
+        
+        if 'id' in area_data:
+            # Update existing area
+            for area in areas:
+                if area.get('id') == area_data['id']:
+                    area.update(area_data)
+                    break
+        else:
+            # Add new area
+            area_data['id'] = len(areas) + 1
+            areas.append(area_data)
+        
+        settings.set_delivery_areas(areas)
+        db.session.commit()
+        return jsonify({'success': True})
+    
+    elif request.method == 'DELETE':
+        if not session.get('admin_logged_in'):
+            return jsonify({'error': 'غير مصرح'}), 403
+        
+        area_id = request.json.get('id')
+        settings = get_or_create_settings()
+        areas = settings.get_delivery_areas()
+        areas = [area for area in areas if area.get('id') != area_id]
+        
+        settings.set_delivery_areas(areas)
+        db.session.commit()
+        return jsonify({'success': True})
+
+@app.route('/api/products/<int:product_id>', methods=['DELETE'])
+def delete_product(product_id):
+    """Delete a product"""
+    if not session.get('admin_logged_in'):
+        return jsonify({'error': 'غير مصرح'}), 403
+    
+    product = models.Product.query.get_or_404(product_id)
+    db.session.delete(product)
+    db.session.commit()
+    return jsonify({'success': True})
 
 @app.route('/filter/<category>')
 def filter_products(category):
     """Filter products by category"""
-    products = load_json_file(PRODUCTS_FILE)
-    if not products:
-        products = get_default_products()
+    products = models.Product.query.all()
     
     if category == 'all':
         filtered_products = products
     else:
-        filtered_products = [p for p in products if p['category'] == category]
+        filtered_products = [p for p in products if p.category == category]
     
-    return jsonify(filtered_products)
+    # Convert to dict format
+    products_data = []
+    for product in filtered_products:
+        products_data.append({
+            'id': product.id,
+            'name': product.name,
+            'price': product.price,
+            'category': product.category,
+            'image': product.image_path,
+            'colors': product.get_colors(),
+            'sizes': product.get_sizes(),
+            'material': product.material,
+            'description': product.description
+        })
+    
+    return jsonify(products_data)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

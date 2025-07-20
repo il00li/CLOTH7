@@ -62,6 +62,11 @@
                     <i class="fas fa-share-alt me-1"></i>التواصل الاجتماعي
                 </button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="delivery-tab" data-bs-toggle="tab" data-bs-target="#delivery" type="button" role="tab">
+                    <i class="fas fa-truck me-1"></i>مناطق التوصيل
+                </button>
+            </li>
         </ul>
 
         <!-- Tab Content -->
@@ -209,6 +214,21 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Delivery Areas -->
+            <div class="tab-pane fade" id="delivery" role="tabpanel">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">إدارة مناطق التوصيل</h5>
+                        <button class="btn btn-primary btn-sm" id="addDeliveryAreaBtn">
+                            <i class="fas fa-plus me-1"></i>إضافة منطقة جديدة
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="deliveryAreasTable"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -236,6 +256,35 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
                     <button type="submit" class="btn btn-primary" form="categoryForm">حفظ التصنيف</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delivery Area Modal -->
+    <div class="modal fade" id="deliveryAreaModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deliveryAreaModalTitle">إضافة منطقة توصيل جديدة</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="deliveryAreaForm">
+                        <input type="hidden" id="deliveryAreaId">
+                        <div class="mb-3">
+                            <label class="form-label">اسم المنطقة</label>
+                            <input type="text" class="form-control" id="deliveryAreaName" required placeholder="مثال: صنعاء">
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="deliveryAreaActive" checked>
+                            <label class="form-check-label">منطقة فعالة</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary" form="deliveryAreaForm">حفظ المنطقة</button>
                 </div>
             </div>
         </div>
@@ -279,8 +328,16 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label">رابط الصورة</label>
-                                    <input type="url" class="form-control" id="productImage" required>
+                                    <label class="form-label">صورة المنتج</label>
+                                    <div class="input-group">
+                                        <input type="file" class="form-control" id="productImageFile" accept="image/*">
+                                        <button type="button" class="btn btn-outline-secondary" id="uploadImageBtn">رفع</button>
+                                    </div>
+                                    <small class="text-muted">أو</small>
+                                    <input type="url" class="form-control mt-1" id="productImage" placeholder="رابط الصورة">
+                                    <div id="imagePreview" class="mt-2" style="display: none;">
+                                        <img src="" alt="معاينة الصورة" style="max-width: 100px; height: auto;">
+                                    </div>
                                 </div>
                             </div>
                         </div>

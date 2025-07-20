@@ -30,12 +30,12 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header-section" id="main-header">
+    <!-- Fixed Glass Header -->
+    <header class="fixed-glass-header" id="main-header">
         <div class="container">
             <div class="row">
                 <div class="col-12 text-center">
-                    <h1 class="store-title">
+                    <h1 class="store-title-glass">
                         <i class="fas fa-store text-primary me-2"></i>
                         {{ settings.store_name }}
                     </h1>
@@ -43,6 +43,9 @@
             </div>
         </div>
     </header>
+    
+    <!-- Spacer for fixed header -->
+    <div class="header-spacer"></div>
 
     <!-- Category Filters -->
     <section class="categories-section py-4">
@@ -122,11 +125,20 @@
         </div>
     </section>
 
-    <!-- Social Media Links -->
+    <!-- Social Media Links & Delivery Areas -->
     <footer class="social-footer py-4">
         <div class="container">
             <div class="row">
                 <div class="col-12 text-center">
+                    <!-- Delivery Areas Button -->
+                    <div class="mb-3">
+                        <button class="btn btn-glass-delivery" id="deliveryAreasBtn" data-bs-toggle="modal" data-bs-target="#deliveryModal">
+                            <i class="fas fa-truck me-2"></i>
+                            مناطق التوصيل المتاحة
+                        </button>
+                    </div>
+                    
+                    <!-- Social Links -->
                     <div class="social-links">
                         {% if settings.social_links.facebook.visible %}
                         <a href="{{ settings.social_links.facebook.url }}" target="_blank" class="social-link">
@@ -150,6 +162,26 @@
             </div>
         </div>
     </footer>
+
+    <!-- Delivery Areas Modal -->
+    <div class="modal fade" id="deliveryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">مناطق التوصيل المتاحة</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="deliveryAreasList">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Admin Login Modal -->
     <div class="modal fade" id="adminLoginModal" tabindex="-1">
