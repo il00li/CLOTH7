@@ -53,15 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Image URL change handler
-    document.getElementById('productImage').addEventListener('input', function() {
-        const imageUrl = this.value.trim();
-        if (imageUrl) {
-            showImagePreview(imageUrl);
-        } else {
-            document.getElementById('imagePreview').style.display = 'none';
-        }
-    });
+    
     
     function loadProducts() {
         fetch('/api/products')
