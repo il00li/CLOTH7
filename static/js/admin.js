@@ -208,6 +208,18 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('productModalTitle').textContent = 'إضافة منتج جديد';
             form.reset();
             document.getElementById('productId').value = '';
+            document.getElementById('productImage').value = '';
+            // مسح معاينة الصورة
+            const preview = document.getElementById('imagePreview');
+            if (preview) {
+                preview.style.display = 'none';
+                preview.innerHTML = '';
+            }
+            // مسح اختيار الملف
+            const fileInput = document.getElementById('productImageFile');
+            if (fileInput) {
+                fileInput.value = '';
+            }
         }
         
         modal.show();
